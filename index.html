@@ -55,7 +55,7 @@
             transform: scale(1.02);
         }
 
-        /* small info tip */
+        /* info tip */
         .info-tip {
             position: fixed;
             bottom: 15px;
@@ -70,6 +70,26 @@
             pointer-events: none;
             font-family: monospace;
             border-left: 3px solid #0ff7b0;
+        }
+
+        /* Copyright notice - bottom right */
+        .copyright {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(5px);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #aaffdd;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.5px;
+            border-right: 2px solid #0ff7b0;
+            border-bottom: 1px solid rgba(0,255,200,0.4);
+            pointer-events: none;
+            text-shadow: 0 0 2px rgba(0,255,200,0.5);
         }
 
         /* Card styling for CSS3D objects */
@@ -139,6 +159,8 @@
             button { padding: 4px 12px; font-size: 0.8rem; }
             .element-card { width: 80px; height: 92px; }
             .symbol { font-size: 22px; }
+            .copyright { font-size: 8px; bottom: 8px; right: 8px; }
+            .info-tip { font-size: 9px; }
         }
     </style>
 </head>
@@ -151,6 +173,9 @@
     </div>
     <div class="info-tip">
         ⚡ DRAG to rotate | RIGHT-CLICK to pan | SCROLL to zoom | HOVER for neon glow
+    </div>
+    <div class="copyright">
+        © 2026 Dagim Gebeyehu | All Rights Reserved
     </div>
 
     <!-- Import Three.js core, addons, TWEEN and TrackballControls via CDN -->
@@ -548,9 +573,7 @@
         }
         
         // small console log
-        console.log(`✨ 3D Periodic Table ready — ${totalElements} elements loaded | Neon Theme Active`);
-        
-        // Optional: add little pulse effect on layout change, but fine
+        console.log(`✨ 3D Periodic Table ready — ${totalElements} elements loaded | Neon Theme Active | © 2026 Dagim Gebeyehu`);
     </script>
 </body>
 </html>
