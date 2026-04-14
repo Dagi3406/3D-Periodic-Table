@@ -153,7 +153,122 @@
             color: #bbffec;
         }
 
-        /* responsive tweaks */
+        /* Modal Styles - Futuristic Neon */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+ backdrop-filter: blur(8px);
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: rgba(8, 18, 28, 0.95);
+            backdrop-filter: blur(12px);
+            width: 320px;
+            max-width: 85vw;
+            border-radius: 28px;
+            border: 1px solid #0ff7b0;
+            box-shadow: 0 0 35px rgba(0, 255, 200, 0.4), inset 0 0 15px rgba(0,255,200,0.1);
+            padding: 20px 24px 24px;
+            font-family: 'Orbitron', 'Segoe UI', monospace;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 26px;
+            cursor: pointer;
+            color: #7effd0;
+            transition: 0.2s;
+            background: none;
+            border: none;
+            font-weight: bold;
+            text-shadow: 0 0 3px #00ffcc;
+        }
+
+        .modal-close:hover {
+            color: #ffffff;
+            text-shadow: 0 0 8px #0ff7b0;
+            transform: scale(1.1);
+        }
+
+        .modal-symbol {
+            font-size: 52px;
+            font-weight: 900;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff, #2affb6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin: 5px 0 0px;
+            letter-spacing: 4px;
+        }
+
+        .modal-name {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 600;
+            color: #bbffec;
+            border-bottom: 1px solid rgba(0,255,200,0.5);
+            display: inline-block;
+            width: auto;
+            margin: 0 auto 12px;
+            padding-bottom: 5px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 12px 0;
+            border-bottom: 1px dashed rgba(0,255,200,0.3);
+            padding-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #7effd0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .detail-value {
+            font-family: monospace;
+            color: #e0fffa;
+            font-weight: 500;
+        }
+
+        .modal-footer {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 10px;
+            color: #4effb0;
+            opacity: 0.7;
+        }
+
         @media (max-width: 700px) {
             .controls { gap: 8px; padding: 8px 16px; }
             button { padding: 4px 12px; font-size: 0.8rem; }
@@ -161,6 +276,9 @@
             .symbol { font-size: 22px; }
             .copyright { font-size: 8px; bottom: 8px; right: 8px; }
             .info-tip { font-size: 9px; }
+            .modal-content { padding: 16px; width: 280px; }
+            .modal-symbol { font-size: 42px; }
+            .modal-name { font-size: 18px; }
         }
     </style>
 </head>
@@ -172,13 +290,47 @@
         <button id="btn-grid">🧊 GRID</button>
     </div>
     <div class="info-tip">
-        ⚡ DRAG to rotate | RIGHT-CLICK to pan | SCROLL to zoom | HOVER for neon glow
+        ⚡ DRAG to rotate | RIGHT-CLICK to pan | SCROLL to zoom | CLICK on element for details
     </div>
     <div class="copyright">
         © 2026 Dagim Gebeyehu | All Rights Reserved
     </div>
 
-    <!-- Import Three.js core, addons, TWEEN and TrackballControls via CDN -->
+    <!-- Modal Popup -->
+    <div id="elementModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+            <div class="modal-symbol" id="modalSymbol">H</div>
+            <div style="text-align: center;"><span class="modal-name" id="modalName">Hydrogen</span></div>
+            <div class="detail-row">
+                <span class="detail-label">Atomic Number</span>
+                <span class="detail-value" id="modalNumber">1</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Atomic Mass</span>
+                <span class="detail-value" id="modalMass">1.008 u</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Category</span>
+                <span class="detail-value" id="modalCategory">Nonmetal</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Electron Config</span>
+                <span class="detail-value" id="modalConfig">1s¹</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Group / Period</span>
+                <span class="detail-value" id="modalGroupPeriod">1 / 1</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Discovered</span>
+                <span class="detail-value" id="modalDiscovered">1766</span>
+            </div>
+            <div class="modal-footer">⚛️ Neon Periodic Table • Interactive 3D</div>
+        </div>
+    </div>
+
+    <!-- Import Three.js core, addons, TWEEN -->
     <script type="importmap">
         {
             "imports": {
@@ -195,21 +347,106 @@
         import * as TWEEN from 'https://unpkg.com/@tweenjs/tween.js@23.1.1/dist/tween.esm.js';
 
         // ----------------------------------------------
-        // 1. BUILD ELEMENTS DATASET (classic up to 86, excluding Lanthanides/Actinides for clean table)
-        // Includes Z=1..56 and Z=72..86 => 71 elements
-        // Each element has: atomicNumber, symbol, name, group (1-18), period (1-6)
+        // 1. BUILD ELEMENTS DATASET with extra details
         // ----------------------------------------------
-        const elementData = [];
-
-        // Helper to add element
-        function addElem(z, symbol, name, group, period) {
-            elementData.push({ atomicNumber: z, symbol, name, group, period });
+        // Extended data: atomic mass (approx real values), category, electron config snippet, discovery year (symbolic)
+        // We'll create a lookup for mass and other info based on atomic number.
+        // Using realistic values for first 86 elements (simplified but accurate enough)
+        const extraInfo = {};
+        
+        // Helper to populate extra data (atomic mass, category, config, discovery)
+        function setExtra(z, mass, category, config, discovered) {
+            extraInfo[z] = { mass, category, config, discovered };
         }
-
-        // Period 1
+        
+        // Populate key elements (abridged but covering our dataset)
+        setExtra(1, "1.008", "Nonmetal / Diatomic", "1s¹", "1766");
+        setExtra(2, "4.0026", "Noble Gas", "1s²", "1895");
+        setExtra(3, "6.94", "Alkali Metal", "[He] 2s¹", "1817");
+        setExtra(4, "9.012", "Alkaline Earth", "[He] 2s²", "1798");
+        setExtra(5, "10.81", "Metalloid", "[He] 2s² 2p¹", "1808");
+        setExtra(6, "12.011", "Nonmetal", "[He] 2s² 2p²", "Ancient");
+        setExtra(7, "14.007", "Nonmetal", "[He] 2s² 2p³", "1772");
+        setExtra(8, "15.999", "Nonmetal", "[He] 2s² 2p⁴", "1774");
+        setExtra(9, "18.998", "Halogen", "[He] 2s² 2p⁵", "1886");
+        setExtra(10, "20.180", "Noble Gas", "[He] 2s² 2p⁶", "1898");
+        setExtra(11, "22.990", "Alkali Metal", "[Ne] 3s¹", "1807");
+        setExtra(12, "24.305", "Alkaline Earth", "[Ne] 3s²", "1755");
+        setExtra(13, "26.982", "Post-transition", "[Ne] 3s² 3p¹", "1825");
+        setExtra(14, "28.086", "Metalloid", "[Ne] 3s² 3p²", "1824");
+        setExtra(15, "30.974", "Nonmetal", "[Ne] 3s² 3p³", "1669");
+        setExtra(16, "32.06", "Nonmetal", "[Ne] 3s² 3p⁴", "Ancient");
+        setExtra(17, "35.45", "Halogen", "[Ne] 3s² 3p⁵", "1774");
+        setExtra(18, "39.95", "Noble Gas", "[Ne] 3s² 3p⁶", "1894");
+        setExtra(19, "39.098", "Alkali Metal", "[Ar] 4s¹", "1807");
+        setExtra(20, "40.078", "Alkaline Earth", "[Ar] 4s²", "1808");
+        setExtra(21, "44.956", "Transition Metal", "[Ar] 3d¹ 4s²", "1879");
+        setExtra(22, "47.867", "Transition Metal", "[Ar] 3d² 4s²", "1791");
+        setExtra(23, "50.942", "Transition Metal", "[Ar] 3d³ 4s²", "1801");
+        setExtra(24, "51.996", "Transition Metal", "[Ar] 3d⁵ 4s¹", "1797");
+        setExtra(25, "54.938", "Transition Metal", "[Ar] 3d⁵ 4s²", "1774");
+        setExtra(26, "55.845", "Transition Metal", "[Ar] 3d⁶ 4s²", "Ancient");
+        setExtra(27, "58.933", "Transition Metal", "[Ar] 3d⁷ 4s²", "1735");
+        setExtra(28, "58.693", "Transition Metal", "[Ar] 3d⁸ 4s²", "1751");
+        setExtra(29, "63.546", "Transition Metal", "[Ar] 3d¹⁰ 4s¹", "Ancient");
+        setExtra(30, "65.38", "Transition Metal", "[Ar] 3d¹⁰ 4s²", "Ancient");
+        setExtra(31, "69.723", "Post-transition", "[Ar] 3d¹⁰ 4s² 4p¹", "1875");
+        setExtra(32, "72.630", "Metalloid", "[Ar] 3d¹⁰ 4s² 4p²", "1886");
+        setExtra(33, "74.922", "Metalloid", "[Ar] 3d¹⁰ 4s² 4p³", "1250");
+        setExtra(34, "78.971", "Nonmetal", "[Ar] 3d¹⁰ 4s² 4p⁴", "1817");
+        setExtra(35, "79.904", "Halogen", "[Ar] 3d¹⁰ 4s² 4p⁵", "1826");
+        setExtra(36, "83.798", "Noble Gas", "[Ar] 3d¹⁰ 4s² 4p⁶", "1898");
+        setExtra(37, "85.468", "Alkali Metal", "[Kr] 5s¹", "1861");
+        setExtra(38, "87.62", "Alkaline Earth", "[Kr] 5s²", "1790");
+        setExtra(39, "88.906", "Transition Metal", "[Kr] 4d¹ 5s²", "1794");
+        setExtra(40, "91.224", "Transition Metal", "[Kr] 4d² 5s²", "1789");
+        setExtra(41, "92.906", "Transition Metal", "[Kr] 4d⁴ 5s¹", "1801");
+        setExtra(42, "95.95", "Transition Metal", "[Kr] 4d⁵ 5s¹", "1778");
+        setExtra(43, "98", "Transition Metal", "[Kr] 4d⁵ 5s²", "1937");
+        setExtra(44, "101.07", "Transition Metal", "[Kr] 4d⁷ 5s¹", "1844");
+        setExtra(45, "102.91", "Transition Metal", "[Kr] 4d⁸ 5s¹", "1803");
+        setExtra(46, "106.42", "Transition Metal", "[Kr] 4d¹⁰", "1803");
+        setExtra(47, "107.87", "Transition Metal", "[Kr] 4d¹⁰ 5s¹", "Ancient");
+        setExtra(48, "112.41", "Transition Metal", "[Kr] 4d¹⁰ 5s²", "1817");
+        setExtra(49, "114.82", "Post-transition", "[Kr] 4d¹⁰ 5s² 5p¹", "1863");
+        setExtra(50, "118.71", "Post-transition", "[Kr] 4d¹⁰ 5s² 5p²", "Ancient");
+        setExtra(51, "121.76", "Metalloid", "[Kr] 4d¹⁰ 5s² 5p³", "Ancient");
+        setExtra(52, "127.60", "Metalloid", "[Kr] 4d¹⁰ 5s² 5p⁴", "1782");
+        setExtra(53, "126.90", "Halogen", "[Kr] 4d¹⁰ 5s² 5p⁵", "1811");
+        setExtra(54, "131.29", "Noble Gas", "[Kr] 4d¹⁰ 5s² 5p⁶", "1898");
+        setExtra(55, "132.91", "Alkali Metal", "[Xe] 6s¹", "1860");
+        setExtra(56, "137.33", "Alkaline Earth", "[Xe] 6s²", "1808");
+        setExtra(72, "178.49", "Transition Metal", "[Xe] 4f¹⁴ 5d² 6s²", "1923");
+        setExtra(73, "180.95", "Transition Metal", "[Xe] 4f¹⁴ 5d³ 6s²", "1802");
+        setExtra(74, "183.84", "Transition Metal", "[Xe] 4f¹⁴ 5d⁴ 6s²", "1781");
+        setExtra(75, "186.21", "Transition Metal", "[Xe] 4f¹⁴ 5d⁵ 6s²", "1925");
+        setExtra(76, "190.23", "Transition Metal", "[Xe] 4f¹⁴ 5d⁶ 6s²", "1803");
+        setExtra(77, "192.22", "Transition Metal", "[Xe] 4f¹⁴ 5d⁷ 6s²", "1803");
+        setExtra(78, "195.08", "Transition Metal", "[Xe] 4f¹⁴ 5d⁹ 6s¹", "Ancient");
+        setExtra(79, "196.97", "Transition Metal", "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", "Ancient");
+        setExtra(80, "200.59", "Transition Metal", "[Xe] 4f¹⁴ 5d¹⁰ 6s²", "Ancient");
+        setExtra(81, "204.38", "Post-transition", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹", "1861");
+        setExtra(82, "207.2", "Post-transition", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²", "Ancient");
+        setExtra(83, "208.98", "Post-transition", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³", "Ancient");
+        setExtra(84, "209", "Post-transition", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴", "1898");
+        setExtra(85, "210", "Halogen", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵", "1940");
+        setExtra(86, "222", "Noble Gas", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶", "1900");
+        
+        // Fallback function for any missing extra (just in case)
+        function getExtraForZ(z) {
+            if (extraInfo[z]) return extraInfo[z];
+            return { mass: (z * 2).toFixed(1) + " u", category: "Synthetic", config: "[core] ns² np?", discovered: "Unknown" };
+        }
+        
+        const elementData = [];
+        function addElem(z, symbol, name, group, period) {
+            const extras = getExtraForZ(z);
+            elementData.push({ atomicNumber: z, symbol, name, group, period, mass: extras.mass, category: extras.category, config: extras.config, discovered: extras.discovered });
+        }
+        
+        // Same dataset as before with extended info
         addElem(1, "H", "Hydrogen", 1, 1);
         addElem(2, "He", "Helium", 18, 1);
-        // Period 2
         addElem(3, "Li", "Lithium", 1, 2);
         addElem(4, "Be", "Beryllium", 2, 2);
         addElem(5, "B", "Boron", 13, 2);
@@ -218,7 +455,6 @@
         addElem(8, "O", "Oxygen", 16, 2);
         addElem(9, "F", "Fluorine", 17, 2);
         addElem(10, "Ne", "Neon", 18, 2);
-        // Period 3
         addElem(11, "Na", "Sodium", 1, 3);
         addElem(12, "Mg", "Magnesium", 2, 3);
         addElem(13, "Al", "Aluminium", 13, 3);
@@ -227,7 +463,6 @@
         addElem(16, "S", "Sulfur", 16, 3);
         addElem(17, "Cl", "Chlorine", 17, 3);
         addElem(18, "Ar", "Argon", 18, 3);
-        // Period 4
         addElem(19, "K", "Potassium", 1, 4);
         addElem(20, "Ca", "Calcium", 2, 4);
         addElem(21, "Sc", "Scandium", 3, 4);
@@ -246,7 +481,6 @@
         addElem(34, "Se", "Selenium", 16, 4);
         addElem(35, "Br", "Bromine", 17, 4);
         addElem(36, "Kr", "Krypton", 18, 4);
-        // Period 5
         addElem(37, "Rb", "Rubidium", 1, 5);
         addElem(38, "Sr", "Strontium", 2, 5);
         addElem(39, "Y", "Yttrium", 3, 5);
@@ -265,10 +499,8 @@
         addElem(52, "Te", "Tellurium", 16, 5);
         addElem(53, "I", "Iodine", 17, 5);
         addElem(54, "Xe", "Xenon", 18, 5);
-        // Period 6 (first two Cs, Ba)
         addElem(55, "Cs", "Cesium", 1, 6);
         addElem(56, "Ba", "Barium", 2, 6);
-        // skip 57-71 (Lanthanides) -> but continue from 72 to 86 (Period 6 transition & post)
         addElem(72, "Hf", "Hafnium", 4, 6);
         addElem(73, "Ta", "Tantalum", 5, 6);
         addElem(74, "W", "Tungsten", 6, 6);
@@ -284,29 +516,23 @@
         addElem(84, "Po", "Polonium", 16, 6);
         addElem(85, "At", "Astatine", 17, 6);
         addElem(86, "Rn", "Radon", 18, 6);
-
-        const totalElements = elementData.length; // 71 elements
-
+        
+        const totalElements = elementData.length;
+        
         // ----------------------------------------------
-        // 2. Setup Scene, Camera, CSS2DRenderer, Controls
+        // 2. Setup Scene, Camera, Renderer, Controls
         // ----------------------------------------------
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x050b10);
-        
-        // Camera: perspective, good for 3D exploration
         const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(20, 12, 28);
-        camera.lookAt(0, 0, 0);
-        
         const renderer = new CSS2DRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.domElement.style.position = 'absolute';
         renderer.domElement.style.top = '0px';
         renderer.domElement.style.left = '0px';
-        renderer.domElement.style.pointerEvents = 'auto'; // allow clicking through?
         document.body.appendChild(renderer.domElement);
         
-        // TrackballControls style with OrbitControls (flexible: rotate/pan/zoom)
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
@@ -318,262 +544,170 @@
         controls.target.set(0, 0, 0);
         
         // ----------------------------------------------
-        // 3. Create CSS2D Objects (Cards)
+        // 3. Create CSS2D Objects + Click Handlers
         // ----------------------------------------------
         const cssObjects = [];
-        const cardsGroup = []; // store references to the object and its original index
         
         elementData.forEach((el, idx) => {
-            // Create card container div
             const cardDiv = document.createElement('div');
             cardDiv.className = 'element-card';
-            
-            // inner HTML structure
             cardDiv.innerHTML = `
                 <div class="atomic-number">${el.atomicNumber}</div>
                 <div class="symbol">${el.symbol}</div>
                 <div class="element-name">${el.name}</div>
             `;
-            
             const css2D = new CSS2DObject(cardDiv);
-            // store element metadata for dynamic positioning
-            css2D.userData = { 
-                atomicNumber: el.atomicNumber,
-                group: el.group,
-                period: el.period,
-                index: idx
-            };
+            css2D.userData = { ...el, index: idx };
+            // Add click event to show modal
+            cardDiv.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showElementDetails(el);
+            });
             scene.add(css2D);
             cssObjects.push(css2D);
         });
         
-        // ----------------------------------------------
-        // 4. Layout Generation Functions (return array of Vector3 positions)
-        // ----------------------------------------------
+        // Modal control functions
+        const modalOverlay = document.getElementById('elementModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
         
-        // --- TABLE LAYOUT (classic periodic table based on group/period)
+        function showElementDetails(el) {
+            document.getElementById('modalSymbol').innerText = el.symbol;
+            document.getElementById('modalName').innerText = el.name;
+            document.getElementById('modalNumber').innerText = el.atomicNumber;
+            document.getElementById('modalMass').innerText = el.mass;
+            document.getElementById('modalCategory').innerText = el.category;
+            document.getElementById('modalConfig').innerText = el.config;
+            document.getElementById('modalGroupPeriod').innerText = `${el.group} / ${el.period}`;
+            document.getElementById('modalDiscovered').innerText = el.discovered;
+            modalOverlay.classList.add('active');
+        }
+        
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+        }
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeModal();
+        });
+        
+        // ----------------------------------------------
+        // 4. Layout Functions (same as before)
+        // ----------------------------------------------
         function getTablePositions() {
             const positions = [];
-            const spacingX = 1.28;
-            const spacingY = 1.28;
-            const startX = -11.5;  // center table horizontally
-            const startY = 5.2;
-            
+            const spacingX = 1.28, spacingY = 1.28, startX = -11.5, startY = 5.2;
             cssObjects.forEach(obj => {
-                const group = obj.userData.group;
-                const period = obj.userData.period;
-                // Compute grid position: group 1-18, period 1-6
+                const group = obj.userData.group, period = obj.userData.period;
                 let x = (group - 1) * spacingX + startX;
                 let y = startY - (period - 1) * spacingY;
-                // special: Helium (group 18 period 1) stays at right side, fine.
-                // No special shifting needed for our dataset, all groups match.
-                // For elements 72-86 they are period 6 group 4..18, correct.
                 positions.push(new THREE.Vector3(x, y, 0));
             });
             return positions;
         }
-        
-        // --- SPHERE LAYOUT: points evenly on a sphere using fibonacci sphere algorithm for uniform distribution
         function getSpherePositions(radius = 8.2) {
-            const positions = [];
-            const count = cssObjects.length;
-            const phiGolden = Math.PI * (3 - Math.sqrt(5));  // golden angle
-            
+            const positions = [], count = cssObjects.length;
+            const phiGolden = Math.PI * (3 - Math.sqrt(5));
             for (let i = 0; i < count; i++) {
-                const y = 1 - (i / (count - 1)) * 2;  // y goes from 1 to -1
+                const y = 1 - (i / (count - 1)) * 2;
                 const radiusAtY = Math.sqrt(1 - y*y);
                 const theta = i * phiGolden * 2;
-                
                 const x = Math.cos(theta) * radiusAtY;
                 const z = Math.sin(theta) * radiusAtY;
-                // final position
-                const pos = new THREE.Vector3(x * radius, y * radius, z * radius);
-                positions.push(pos);
+                positions.push(new THREE.Vector3(x * radius, y * radius, z * radius));
             }
             return positions;
         }
-        
-        // --- HELIX LAYOUT: vertical spiral (cylindrical helix)
         function getHelixPositions(radius = 5.5, heightTotal = 15, turns = 2.5) {
-            const positions = [];
-            const count = cssObjects.length;
+            const positions = [], count = cssObjects.length;
             for (let i = 0; i < count; i++) {
-                const t = i / (count - 1); // 0..1
+                const t = i / (count - 1);
                 const angle = t * Math.PI * 2 * turns;
                 const y = (t - 0.5) * heightTotal;
-                const x = Math.cos(angle) * radius;
-                const z = Math.sin(angle) * radius;
-                positions.push(new THREE.Vector3(x, y, z));
+                positions.push(new THREE.Vector3(Math.cos(angle) * radius, y, Math.sin(angle) * radius));
             }
             return positions;
         }
-        
-        // --- GRID LAYOUT: multi-layered 3D cube (cubic grid)
         function getGridPositions() {
             const count = cssObjects.length;
-            // Determine grid dimensions: approx cube root
             const side = Math.ceil(Math.pow(count, 1/3));
             const spacing = 1.9;
-            const offset = (side - 1) * spacing / 2;
             const positions = [];
             let idx = 0;
-            for (let i = 0; i < side && idx < count; i++) {
-                for (let j = 0; j < side && idx < count; j++) {
-                    for (let k = 0; k < side && idx < count; k++) {
-                        const x = (i - (side-1)/2) * spacing;
-                        const y = (j - (side-1)/2) * spacing;
-                        const z = (k - (side-1)/2) * spacing;
-                        positions.push(new THREE.Vector3(x, y, z));
-                        idx++;
-                    }
-                }
-            }
-            // if some elements remain due to rounding, fill at end (should not happen, side^3 >= count)
-            while(positions.length < count) {
-                positions.push(new THREE.Vector3(0, 0, 0));
-            }
+            for (let i = 0; i < side && idx < count; i++)
+                for (let j = 0; j < side && idx < count; j++)
+                    for (let k = 0; k < side && idx < count; k++)
+                        positions.push(new THREE.Vector3((i - (side-1)/2) * spacing, (j - (side-1)/2) * spacing, (k - (side-1)/2) * spacing));
+            while(positions.length < count) positions.push(new THREE.Vector3(0,0,0));
             return positions;
         }
         
-        // ----------------------------------------------
-        // 5. Animation using TWEEN.js
-        // ----------------------------------------------
         let activeTweens = [];
-        
         function animateToLayout(targetPositions, duration = 1100) {
-            // kill any ongoing tweens to avoid conflicts
-            activeTweens.forEach(tween => tween.stop());
+            activeTweens.forEach(t => t.stop());
             activeTweens = [];
-            
             cssObjects.forEach((obj, i) => {
                 const startPos = obj.position.clone();
                 const endPos = targetPositions[i];
                 if (!endPos) return;
-                
-                // create tween for position properties
                 const tweenObj = { x: startPos.x, y: startPos.y, z: startPos.z };
-                const tween = new TWEEN.Tween(tweenObj)
-                    .to({ x: endPos.x, y: endPos.y, z: endPos.z }, duration)
-                    .easing(TWEEN.Easing.Quadratic.InOut)
-                    .onUpdate(() => {
-                        obj.position.set(tweenObj.x, tweenObj.y, tweenObj.z);
-                    })
-                    .start();
+                const tween = new TWEEN.Tween(tweenObj).to({ x: endPos.x, y: endPos.y, z: endPos.z }, duration).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(() => obj.position.set(tweenObj.x, tweenObj.y, tweenObj.z)).start();
                 activeTweens.push(tween);
             });
-            
-            // start animation loop if needed
             TWEEN.update();
         }
         
-        // ----------------------------------------------
-        // 6. Setup button interactions & initial layout (Table default)
-        // ----------------------------------------------
         let currentLayout = 'table';
-        
         function setLayout(layoutType) {
             if (currentLayout === layoutType) return;
             currentLayout = layoutType;
             let positions = [];
-            switch(layoutType) {
-                case 'table':
-                    positions = getTablePositions();
-                    break;
-                case 'sphere':
-                    positions = getSpherePositions(8.4);
-                    break;
-                case 'helix':
-                    positions = getHelixPositions(6.2, 14, 2.6);
-                    break;
-                case 'grid':
-                    positions = getGridPositions();
-                    break;
-                default:
-                    positions = getTablePositions();
-            }
+            if (layoutType === 'table') positions = getTablePositions();
+            else if (layoutType === 'sphere') positions = getSpherePositions(8.4);
+            else if (layoutType === 'helix') positions = getHelixPositions(6.2, 14, 2.6);
+            else if (layoutType === 'grid') positions = getGridPositions();
+            else positions = getTablePositions();
             animateToLayout(positions, 1050);
         }
         
-        // Attach event listeners
         document.getElementById('btn-table').addEventListener('click', () => setLayout('table'));
         document.getElementById('btn-sphere').addEventListener('click', () => setLayout('sphere'));
         document.getElementById('btn-helix').addEventListener('click', () => setLayout('helix'));
         document.getElementById('btn-grid').addEventListener('click', () => setLayout('grid'));
         
-        // initial table layout
         const initialPositions = getTablePositions();
-        cssObjects.forEach((obj, i) => {
-            obj.position.copy(initialPositions[i]);
-        });
+        cssObjects.forEach((obj, i) => obj.position.copy(initialPositions[i]));
         
-        // ----------------------------------------------
-        // 7. Add subtle starfield background effect (Three.js particles)
-        //    to enhance futuristic vibe, behind CSS2D
-        // ----------------------------------------------
+        // starfield and decor
         const starGeometry = new THREE.BufferGeometry();
-        const starCount = 1600;
-        const starPositions = new Float32Array(starCount * 3);
-        for (let i = 0; i < starCount; i++) {
-            starPositions[i*3] = (Math.random() - 0.5) * 400;
-            starPositions[i*3+1] = (Math.random() - 0.5) * 200;
-            starPositions[i*3+2] = (Math.random() - 0.5) * 150 - 70;
-        }
+        const starPositions = new Float32Array(1600 * 3);
+        for (let i = 0; i < 1600; i++) { starPositions[i*3] = (Math.random() - 0.5)*400; starPositions[i*3+1] = (Math.random() - 0.5)*200; starPositions[i*3+2] = (Math.random() - 0.5)*150 - 70; }
         starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-        const starMaterial = new THREE.PointsMaterial({ color: 0x66ffcc, size: 0.25, transparent: true, opacity: 0.6 });
-        const stars = new THREE.Points(starGeometry, starMaterial);
+        const stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ color: 0x66ffcc, size: 0.25, transparent: true, opacity: 0.6 }));
         scene.add(stars);
-        
-        // Add a faint glowing grid on floor to complement
-        const gridHelper = new THREE.GridHelper(45, 28, 0x00ccaa, 0x226655);
-        gridHelper.position.y = -6.5;
-        gridHelper.material.transparent = true;
-        gridHelper.material.opacity = 0.2;
-        scene.add(gridHelper);
-        
-        // subtle ambient light not necessary for CSS but adds depth for star particles, but fine.
-        const ambientLight = new THREE.AmbientLight(0x111122);
-        scene.add(ambientLight);
-        
-        // add a central glowing wireframe sphere for style? Not needed, but cool
+        const gridHelper = new THREE.GridHelper(45, 28, 0x00ccaa, 0x226655); gridHelper.position.y = -6.5; gridHelper.material.transparent = true; gridHelper.material.opacity = 0.2; scene.add(gridHelper);
+        const ambientLight = new THREE.AmbientLight(0x111122); scene.add(ambientLight);
         const glowSphereGeo = new THREE.SphereGeometry(3.2, 32, 16);
-        const wireMat = new THREE.MeshBasicMaterial({ color: 0x0ff7b0, wireframe: true, transparent: true, opacity: 0.09 });
-        const decorSphere = new THREE.Mesh(glowSphereGeo, wireMat);
+        const decorSphere = new THREE.Mesh(glowSphereGeo, new THREE.MeshBasicMaterial({ color: 0x0ff7b0, wireframe: true, transparent: true, opacity: 0.09 }));
         scene.add(decorSphere);
         
-        // rotate decor sphere slowly
-        function animateDecor() {
-            decorSphere.rotation.x += 0.002;
-            decorSphere.rotation.y += 0.003;
-            requestAnimationFrame(animateDecor);
-        }
-        animateDecor();
-        
-        // ----------------------------------------------
-        // 8. Render Loop & TWEEN updates
-        // ----------------------------------------------
         function animate() {
             requestAnimationFrame(animate);
-            TWEEN.update();      // update ongoing transitions
-            controls.update();   // update orbit controls
+            TWEEN.update();
+            controls.update();
             renderer.render(scene, camera);
-            
-            // subtle star rotation for ambiance
             stars.rotation.y += 0.0005;
             stars.rotation.x += 0.0003;
+            decorSphere.rotation.x += 0.002;
+            decorSphere.rotation.y += 0.003;
         }
-        
         animate();
-        
-        // handle window resize
-        window.addEventListener('resize', onWindowResize, false);
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-        
-        // small console log
-        console.log(`✨ 3D Periodic Table ready — ${totalElements} elements loaded | Neon Theme Active | © 2026 Dagim Gebeyehu`);
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        console.log(`✨ 3D Periodic Table with detailed popups — ${totalElements} elements | © 2026 Dagim Gebeyehu`);
     </script>
 </body>
 </html>
